@@ -1,21 +1,24 @@
 #! /bin/bash -eu
 
 DIR=$(pwd)
-read -p "Password: " -s pass; echo
 
 link_dotfiles() {
-    ln -sf ${DIR}/.tmux.conf ~/.tmux.conf
+    ln -sf -t ~/ ${DIR}/.tmux.conf
+    if [ -e ~/.emacs.d ] ; then
+        rm -rf ~/.emacs.d
+    fi
+    ln -sf -t ~/ ~/ ${DIR}/.emacs.d/
 }
 
 install_dependencies() {
-    echo $pass | sudo -S apt update
-    echo $pass | sudo -S apt upgrade
+    sudo -S apt update
+    sudo -S apt upgrade
     install_tmux
 }
 
 install_tmux() {
     echo "# setting up tmux"
-    echo $pass | sudo -S apt install tmux fonts-powerline
+    sudo -S apt install tmux fonts-powerline
 
     local TPM_DIR=~/.tmux/plugins/tpm
     if ! [ -e $TPM_DIR ] ; then
