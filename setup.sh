@@ -11,14 +11,14 @@ link_dotfiles() {
 }
 
 install_dependencies() {
-    sudo -S apt update
-    sudo -S apt upgrade
+    sudo apt update
+    sudo apt -y upgrade
     install_tmux
 }
 
 install_tmux() {
     echo "# setting up tmux"
-    sudo -S apt install tmux fonts-powerline
+    sudo apt install -y tmux fonts-powerline
 
     local TPM_DIR=~/.tmux/plugins/tpm
     if ! [ -e $TPM_DIR ] ; then
