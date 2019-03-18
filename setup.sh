@@ -28,5 +28,10 @@ install_tmux() {
     fi
 }
 
+postprocess() {
+    tmux source-file ~/.tmux.conf
+}
+
 install_dependencies
 link_dotfiles
+postprocess
