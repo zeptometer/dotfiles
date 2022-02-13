@@ -22,9 +22,12 @@
 ;; view
 (show-paren-mode t)
 (column-number-mode t)
+(global-display-line-numbers-mode)
+(tab-bar-mode 1)
 (if window-system
     (tool-bar-mode 0)
-    (menu-bar-mode -1))
+  (menu-bar-mode -1))
+
 (unless window-system
   (set-face-inverse-video 'vertical-border nil)
   (set-face-background 'vertical-border (face-background 'default))
@@ -53,7 +56,7 @@
 
 (setq my-favorite-packages
       '(auctex
-	ddskk
+	      ddskk
         magit
         markdown-mode
         paredit
@@ -62,13 +65,14 @@
         undo-tree
         xclip
         color-theme-sanityinc-tomorrow
-        dracula-theme))
+        dracula-theme
+        proof-general
+        tuareg
+        solarized-theme))
 
 ;; possibly useful packages
 '(dtrt-indent
   flycheck)
-
-(straight-use-package 'tuareg)
 
 (dolist (package my-favorite-packages)
   (straight-use-package package))
@@ -133,19 +137,21 @@
 (add-hook 'slime-repl-mode-hook 'override-slime-repl-bindings-with-paredit)
 
 ;; Beluga mode
-(add-to-list 'load-path "~/Dropbox/Codes/Beluga/tools/")
-(load "beluga-mode.el")
+;; (add-to-list 'load-path "~/Dropbox/Codes/Beluga/tools/")
+;; (load "beluga-mode.el")
+
+(load-theme 'solarized-light t)
 
 (when window-system
-  (set-face-attribute 'default nil :family "Hack Regular" :height 140)
+  (set-face-attribute 'default nil :family "Source Han Code JP" :height 120)
   ; 全角かな設定
   (set-fontset-font (frame-parameter nil 'font)
                     'japanese-jisx0208
-                    (font-spec :family "Noto Sans Mono CJK JP Regular" :size 14))
+                    (font-spec :family "Source Han Code JP" :size 14))
   ; 半角ｶﾅ設定
   (set-fontset-font (frame-parameter nil 'font)
                     'katakana-jisx0201
-                    (font-spec :family "Noto Sans Mono CJK JP Regular" :size 14))
+                    (font-spec :family "Source Han Code JP" :size 14))
   ; ずれ確認用
   ; 0123456789012345678901234567890123456789
   ; ｱｲｳｴｵｱｲｳｴｵｱｲｳｴｵｱｲｳｴｵｱｲｳｴｵｱｲｳｴｵｱｲｳｴｵｱｲｳｴｵ
@@ -157,11 +163,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(current-language-environment "Japanese")
- '(custom-enabled-themes (quote (sanityinc-tomorrow-night)))
- '(custom-safe-themes
-   (quote
-    ("0301a26dedfda81ca220ad6169588b5408884e7b4a5363f3e6a0e98d5c65a257" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" default))))
+ '(warning-suppress-types '(((unlock-file)) ((unlock-file)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

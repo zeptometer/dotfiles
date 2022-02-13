@@ -10,15 +10,14 @@ link_dotfiles() {
     ln -sf -t ~/ ~/ ${DIR}/.emacs.d/
 }
 
-install_dependencies() {
+install_dependencies_ubuntu() {
     sudo apt update
     sudo apt -y upgrade
-    install_tmux
+    sudo apt install -y tmux fonts-powerline
 }
 
-install_tmux() {
-    echo "# setting up tmux"
-    sudo apt install -y tmux fonts-powerline
+install_tpm() {
+    echo "# setting up tpm"
 
     local TPM_DIR=~/.tmux/plugins/tpm
     if ! [ -e $TPM_DIR ] ; then
@@ -32,6 +31,6 @@ postprocess() {
     tmux source-file ~/.tmux.conf
 }
 
-install_dependencies
+# install_dependencies_ubuntu
 link_dotfiles
 postprocess
