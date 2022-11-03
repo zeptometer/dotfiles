@@ -7,13 +7,14 @@ link_dotfiles() {
     if [ -e ~/.emacs.d ] ; then
         rm -rf ~/.emacs.d
     fi
-    ln -sf -t ~/ ~/ ${DIR}/.emacs.d/
+    ln -sf -t ~/ ${DIR}/.emacs.d/
 }
 
 install_dependencies_ubuntu() {
     sudo apt update
     sudo apt -y upgrade
     sudo apt install -y tmux fonts-powerline
+    sudo snap emacs
 }
 
 install_tpm() {
@@ -31,6 +32,6 @@ postprocess() {
     tmux source-file ~/.tmux.conf
 }
 
-# install_dependencies_ubuntu
+install_dependencies_ubuntu
 link_dotfiles
 postprocess

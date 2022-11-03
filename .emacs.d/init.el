@@ -44,14 +44,16 @@
 (require 'package)
 (setq package-archives
       '(("melpa" . "https://melpa.org/packages/")
-        ("org" . "https://orgmode.org/elpa/")
-        ("gnu" . "https://elpa.gnu.org/packages/")))
+        ("gnu" . "https://elpa.gnu.org/packages/")
+        ("org" . "https://orgmode.org/elpa/")))
 (package-initialize)
-(package-refresh-contents)
+(if package-archive-contents
+    (package-refresh-contents t)
+    (package-refresh-contents))
 
 (setq my-favorite-packages
       '(auctex
-	      ddskk
+        ddskk
         magit
         markdown-mode
         paredit
