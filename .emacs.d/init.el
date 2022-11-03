@@ -41,18 +41,13 @@
 (setq text-mode-hook 'turn-off-auto-fill)
 
 ;; package
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
+(require 'package)
+(setq package-archives
+      '(("melpa" . "https://melpa.org/packages/")
+        ("org" . "https://orgmode.org/elpa/")
+        ("gnu" . "https://elpa.gnu.org/packages/")))
+(package-initialize)
+(package-refresh-contents)
 
 (setq my-favorite-packages
       '(auctex
@@ -68,14 +63,19 @@
         dracula-theme
         proof-general
         tuareg
-        solarized-theme))
+        solarized-theme
+        highlight-indent-guides))
 
 ;; possibly useful packages
 '(dtrt-indent
   flycheck)
 
 (dolist (package my-favorite-packages)
-  (straight-use-package package))
+  (unless (package-installed-p package)
+    (package-install package)))
+
+;;; highlight-indent-guide-mode
+(add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
 
 ;;; xclip
 (unless window-system (xclip-mode 1))
@@ -140,8 +140,6 @@
 ;; (add-to-list 'load-path "~/Dropbox/Codes/Beluga/tools/")
 ;; (load "beluga-mode.el")
 
-(load-theme 'solarized-light t)
-
 (when window-system
   (set-face-attribute 'default nil :family "Source Han Code JP" :height 120)
   ; 全角かな設定
@@ -163,6 +161,12 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-enabled-themes '(leuven))
+ '(custom-safe-themes
+   '("3e200d49451ec4b8baa068c989e7fba2a97646091fd555eca0ee5a1386d56077" "285d1bf306091644fb49993341e0ad8bafe57130d9981b680c1dbd974475c5c7" "00445e6f15d31e9afaa23ed0d765850e9cd5e929be5e8e63b114a3346236c44c" default))
+ '(highlight-indent-guides-method 'character)
+ '(package-selected-packages
+   '(highlight-indent-guides solarized-theme tuareg proof-general dracula-theme color-theme-sanityinc-tomorrow xclip undo-tree smooth-scroll slime paredit markdown-mode magit ddskk auctex))
  '(warning-suppress-types '(((unlock-file)) ((unlock-file)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
