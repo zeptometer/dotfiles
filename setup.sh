@@ -14,13 +14,15 @@ link_dotfiles() {
     ln -sf -t ~/ ${DIR}/.emacs.d/
 }
 
+
 install_dependencies_ubuntu() {
     sudo apt update
     sudo apt -y upgrade
-    sudo apt install -y tmux fonts-powerline git build-essential uim-skk guake python3-gpg steam xclip silversearcher-ag
+    sudo apt install -y tmux fonts-powerline git build-essential uim-skk guake python3-gpg steam xclip silversearcher-ag texlive-full opam
     sudo snap install emacs  --classic
     sudo snap install code  --classic
     sudo snap install bitwarden
+    sudo snap install zoom-client
 
     rm -rf tmp_deb
     mkdir tmp_deb
@@ -76,7 +78,14 @@ setup_tmux() {
     fi
 }
 
+setup_opam() {
+    opam init -a
+    eval $(opam env --switch=default)
+    opam install -y ocaml-lsp-server odoc ocamlformat utop ott
+}
+
 install_dependencies_ubuntu
 setup_git
 setup_tmux
+setup_opam
 link_dotfiles
