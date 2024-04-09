@@ -14,13 +14,19 @@ link_dotfiles() {
     ln -sf -t ~/ ${DIR}/.emacs.d/
 }
 
-
 install_dependencies_ubuntu() {
+    if find /etc/apt/ -name *.list | xargs cat | grep  ^[[:space:]]*deb | grep -q linrunner/tlp; then
+        echo "# tlp repo is alreday added"
+    else
+        echo "# Adding tlp repo"
+        sudo add-apt-repository -y ppa:linrunner/tlp
+    fi
     sudo apt update
     sudo apt -y upgrade
-    sudo apt install -y tmux fonts-powerline git build-essential uim-skk guake python3-gpg steam xclip silversearcher-ag texlive-full opam
-    sudo snap install emacs  --classic
-    sudo snap install code  --classic
+    sudo apt install -y tmux fonts-powerline git build-essential uim-skk guake python3-gpg steam xclip silversearcher-ag texlive-full opam gnome-tweaks tlp
+
+    sudo snap install emacs --classic
+    sudo snap install code --classic
     sudo snap install bitwarden
     sudo snap install zoom-client
 
