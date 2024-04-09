@@ -22,6 +22,7 @@ install_dependencies_ubuntu() {
     sudo snap install code  --classic
     sudo snap install bitwarden
 
+    rm -rf tmp_deb
     mkdir tmp_deb
     cd tmp_deb
 
@@ -51,14 +52,13 @@ install_dependencies_ubuntu() {
         wget -O dropbox.deb https://www.dropbox.com/download?dl=packages/ubuntu/dropbox_2020.03.04_amd64.deb
         sudo dpkg -i dropbox.deb
     fi
-    rm -rf tmp_deb
 
     echo "For Slack, you would need to install it manually (not from Snap!)"
 }
 
 setup_git() {
     git config --global user.name "Yuito Murase"
-    git config --global user.email yuito@acupof.cofee
+    git config --global user.email yuito@acupof.coffee
 
     if [ ! -f ~/.ssh/id_ed25519 ]; then
         ssh-keygen -t ed25519 -C ${HOSTNAME} -f ~/.ssh/id_ed25519 -P $SSHPASS
