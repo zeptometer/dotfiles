@@ -41,24 +41,18 @@ install_dependencies_ubuntu() {
     sudo apt -y upgrade
     sudo apt install -y tmux fonts-powerline git build-essential guake python3-gpg steam xclip silversearcher-ag opam gnome-tweaks tlp tailscale software-properties-common appimagelauncher ibus-skk skkdic
 
-    sudo snap install emacs --classic
     sudo snap install code --classic
+    sudo snap install emacs --classic
     sudo snap install bitwarden
+    sudo snap install discord
     sudo snap install miro
+    sudo snap install slack
     sudo snap install zoom-client
     sudo snap install zotero-snap
 
     rm -rf tmp_deb
     mkdir tmp_deb
     cd tmp_deb
-
-    if dpkg -s discord >/dev/null 2>&1; then
-        echo "# Discord is already installed."
-    else
-        echo "# Installing Discord"
-        wget -O discord.deb "https://discord.com/api/download?platform=linux&format=deb"
-        sudo dpkg -i discord.deb
-    fi
 
     if dpkg -s vivaldi-stable >/dev/null 2>&1; then
         echo "# Vivaldi is already installed."
@@ -77,8 +71,6 @@ install_dependencies_ubuntu() {
         wget -O dropbox.deb https://www.dropbox.com/download?dl=packages/ubuntu/dropbox_2020.03.04_amd64.deb
         sudo dpkg -i dropbox.deb
     fi
-
-    echo "For Slack, you would need to install it manually (not from Snap!)"
 }
 
 setup_git() {
