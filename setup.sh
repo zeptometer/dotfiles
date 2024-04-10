@@ -21,9 +21,17 @@ install_dependencies_ubuntu() {
         echo "# Adding tlp repo"
         sudo add-apt-repository -y ppa:linrunner/tlp
     fi
+    if find /etc/apt/ -name *.list | xargs cat | grep  ^[[:space:]]*deb | grep -q tailscale; then
+        echo "# tailscale repo is alreday added"
+    else
+        echo "# Adding tailscale repo"
+        # Copied from https://tailscale.com/download/linux/ubuntu-2204
+        curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/jammy.noarmor.gpg | sudo tee /usr/share/keyrings/tailscale-archive-keyring.gpg >/dev/null
+        curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/jammy.tailscale-keyring.list | sudo tee /etc/apt/sources.list.d/tailscale.list
+    fi
     sudo apt update
     sudo apt -y upgrade
-    sudo apt install -y tmux fonts-powerline git build-essential uim-skk guake python3-gpg steam xclip silversearcher-ag texlive-full opam gnome-tweaks tlp
+    sudo apt install -y tmux fonts-powerline git build-essential uim-skk guake python3-gpg steam xclip silversearcher-ag texlive-full opam gnome-tweaks tlp tailscale
 
     sudo snap install emacs --classic
     sudo snap install code --classic
@@ -90,8 +98,14 @@ setup_opam() {
     opam install -y ocaml-lsp-server odoc ocamlformat utop ott
 }
 
+blocking_setup_tailscale() {
+    sudo tailscale up
+}
+
 install_dependencies_ubuntu
 setup_git
 setup_tmux
 setup_opam
 link_dotfiles
+# potentially blocking operations that require user input
+blocking_setup_tailscale
