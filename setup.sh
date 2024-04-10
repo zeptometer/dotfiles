@@ -39,13 +39,14 @@ install_dependencies_ubuntu() {
 
     sudo apt update
     sudo apt -y upgrade
-    sudo apt install -y tmux fonts-powerline git build-essential uim-skk guake python3-gpg steam xclip silversearcher-ag opam gnome-tweaks tlp tailscale software-properties-common appimagelauncher
+    sudo apt install -y tmux fonts-powerline git build-essential guake python3-gpg steam xclip silversearcher-ag opam gnome-tweaks tlp tailscale software-properties-common appimagelauncher ibus-skk skkdic
 
     sudo snap install emacs --classic
     sudo snap install code --classic
     sudo snap install bitwarden
     sudo snap install miro
     sudo snap install zoom-client
+    sudo snap install zotero-snap
 
     rm -rf tmp_deb
     mkdir tmp_deb
@@ -106,6 +107,12 @@ setup_opam() {
     opam install -y ocaml-lsp-server odoc ocamlformat utop ott
 }
 
+setup_guake() {
+    if [ ! -f /etc/xdg/autostart/autostart-guake.desktop ]; then
+        sudo ln -s /usr/share/guake/autostart-guake.desktop /etc/xdg/autostart/
+    fi
+}
+
 blocking_setup_ledger() {
     # Copied from https://support.ledger.com/hc/ja/articles/4404389606417-Ledger-Live%E3%82%92%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89-%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB?docs=true
     mkdir -p tmp/ledger
@@ -140,12 +147,20 @@ blocking_install_texlive() {
     sudo apt-get install texlive-full
 }
 
+show_post_setup_msg() {
+    echo "# Steps after setup"
+    echo "* Set ibus-skk as the primary input method"
+    echo "* (If necessary) Edit ibus-skk config file to change keyboard layout"
+}
+
 install_dependencies_ubuntu
 setup_git
 setup_tmux
 setup_opam
+setup_guake
 link_dotfiles
 # potentially blocking operations that require user input
 blocking_install_texlive
 blocking_setup_tailscale
 blocking_setup_ledger
+show_post_setup_msg
