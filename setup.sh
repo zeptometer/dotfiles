@@ -101,7 +101,7 @@ setup_opam() {
 
 setup_guake() {
     if [ ! -f /etc/xdg/autostart/autostart-guake.desktop ]; then
-        sudo ln -s /usr/share/guake/autostart-guake.desktop /etc/xdg/autostart/
+        sudo cp /usr/share/guake/autostart-guake.desktop /etc/xdg/autostart/
     fi
 }
 
