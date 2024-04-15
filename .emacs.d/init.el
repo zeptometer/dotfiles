@@ -67,6 +67,7 @@
         dracula-theme
         proof-general
         tuareg
+        opam-switch-mode
         solarized-theme
         indent-guide))
 
@@ -144,6 +145,9 @@
 ;; (add-to-list 'load-path "~/Dropbox/Codes/Beluga/tools/")
 ;; (load "beluga-mode.el")
 
+;; Tuareg
+(setq tuareg-support-metaocaml t)
+
 (when window-system
   (set-face-attribute 'default nil :family "Source Han Code JP" :height 120)
                                         ; 全角かな設定
@@ -167,10 +171,10 @@
  ;; If there is more than one, they won't work right.
  '(custom-enabled-themes '(leuven))
  '(custom-safe-themes
-   '("3e200d49451ec4b8baa068c989e7fba2a97646091fd555eca0ee5a1386d56077" "285d1bf306091644fb49993341e0ad8bafe57130d9981b680c1dbd974475c5c7" "00445e6f15d31e9afaa23ed0d765850e9cd5e929be5e8e63b114a3346236c44c" default))
+   '("efcecf09905ff85a7c80025551c657299a4d18c5fcfedd3b2f2b6287e4edd659" "524fa911b70d6b94d71585c9f0c5966fe85fb3a9ddd635362bfabd1a7981a307" "57a29645c35ae5ce1660d5987d3da5869b048477a7801ce7ab57bfb25ce12d3e" "4c56af497ddf0e30f65a7232a8ee21b3d62a8c332c6b268c81e9ea99b11da0d3" "3e200d49451ec4b8baa068c989e7fba2a97646091fd555eca0ee5a1386d56077" "285d1bf306091644fb49993341e0ad8bafe57130d9981b680c1dbd974475c5c7" "00445e6f15d31e9afaa23ed0d765850e9cd5e929be5e8e63b114a3346236c44c" default))
  '(highlight-indent-guides-method 'character)
  '(package-selected-packages
-   '(indent-guide highlight-indent-guides solarized-theme tuareg proof-general dracula-theme color-theme-sanityinc-tomorrow xclip undo-tree smooth-scroll slime paredit markdown-mode magit ddskk auctex))
+   '(opam-switch-mode indent-guide highlight-indent-guides solarized-theme tuareg proof-general dracula-theme color-theme-sanityinc-tomorrow xclip undo-tree smooth-scroll slime paredit markdown-mode magit ddskk auctex))
  '(warning-suppress-types '(((unlock-file)) ((unlock-file)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
