@@ -11,17 +11,23 @@ link_dotfiles() {
         rm -rf ~/.emacs.d
     fi
     ln -sf -t ~/ ${DIR}/.emacs.d/
+    ln -sf -t ~/ ${DIR}/.agda
 }
 
 install_dependencies() {
 	sudo pacman -Sy
-    sudo pacman -S --noconfirm --needed base-devel yay manjaro-asian-input-support-ibus ibus-skk skk-jisyo vivaldi discord bitwarden steam code emacs tmux awesome-terminal-fonts opam the_silver_searcher xclip tailscale ledger-live-bin guake manjaro-printer avahi obsidian
+    sudo pacman -S --noconfirm --needed base-devel yay manjaro-asian-input-support-ibus ibus-skk skk-jisyo vivaldi discord bitwarden steam code emacs tmux awesome-terminal-fonts opam the_silver_searcher xclip tailscale ledger-live-bin guake manjaro-printer avahi obsidian gimp inkscape agda agda-stdlib
     sudo pacman -S --noconfirm --needed texlive-latex texlive-latexrecommended texlive-latexextra texlive-fontsrecommended texlive-fontsextra texlive-mathscience texlive-langcjk texlive-luatex texlive-binextra
 
     yes | LANG=C yay --answerdiff None --answerclean None --mflags "--noconfirm" -S --needed slack-electron zoom dropbox zotero otf-source-han-code-jp
 
     # might not be working
     # xdg-settings set default-web-browser vivaldi.desktop
+}
+
+# Note: This is dependent on link_dotfiles (emacs.d/init.el)
+setup_agda() {
+    agda-mode setup
 }
 
 setup_git() {
@@ -77,4 +83,5 @@ setup_opam
 setup_printer
 setup_tmux
 link_dotfiles
+setup_agda
 blocking_setup_tailscale
