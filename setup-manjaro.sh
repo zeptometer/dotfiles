@@ -12,6 +12,8 @@ link_dotfiles() {
     fi
     ln -sf -t ~/ ${DIR}/.emacs.d/
     ln -sf -t ~/ ${DIR}/.agda
+
+    cp ${DIR}/.config/autostart/* ~/.config/autostart/
 }
 
 install_dependencies() {

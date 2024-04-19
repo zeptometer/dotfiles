@@ -1,0 +1,8 @@
+ [Desktop Entry]
+ Type=Application
+ Terminal=false
+ Name=Guake
+ Exec=guake
+ Icon=
+ Comment=Run guake
+ Categories=System;

@@ -1,0 +1,9 @@
+ [Desktop Entry]
+ Type=Application
+ NoDisplay=true
+ Terminal=false
+ Name=IBus Daemon (w dconf)
+ Exec=/usr/bin/ibus-daemon -r -d -x --config=/usr/libexec/ibus-dconf
+ Icon=
+ Comment=Replace the IBus-Daemon.
+ Categories=System;
