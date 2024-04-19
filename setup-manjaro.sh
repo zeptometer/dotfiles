@@ -16,7 +16,7 @@ link_dotfiles() {
 
 install_dependencies() {
 	sudo pacman -Sy
-    sudo pacman -S --noconfirm --needed base-devel yay manjaro-asian-input-support-ibus ibus-skk skk-jisyo vivaldi discord bitwarden steam code emacs tmux awesome-terminal-fonts opam the_silver_searcher xclip tailscale ledger-live-bin guake manjaro-printer avahi obsidian gimp inkscape agda agda-stdlib
+    sudo pacman -S --noconfirm --needed base-devel yay manjaro-asian-input-support-ibus ibus-skk skk-jisyo vivaldi discord bitwarden steam code emacs tmux awesome-terminal-fonts opam the_silver_searcher xclip tailscale ledger-live-bin guake manjaro-printer avahi obsidian gimp inkscape agda agda-stdlib gtksourceview3
     sudo pacman -S --noconfirm --needed texlive-latex texlive-latexrecommended texlive-latexextra texlive-fontsrecommended texlive-fontsextra texlive-mathscience texlive-langcjk texlive-luatex texlive-binextra
 
     yes | LANG=C yay --answerdiff None --answerclean None --mflags "--noconfirm" -S --needed slack-electron zoom dropbox zotero otf-source-han-code-jp
@@ -43,6 +43,9 @@ setup_opam() {
     opam init -a
     eval $(opam env --switch=default)
     opam install -y ocaml-lsp-server odoc ocamlformat utop ott
+
+    # Coq
+    opam install -y coq coqide
 
     # BER MetaOCaml
     if ! opam switch list | grep -q 4.14.1+BER; then
