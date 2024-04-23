@@ -1,3 +1,27 @@
+;; <leaf-install-code>
+(eval-and-compile
+  (customize-set-variable
+   'package-archives '(("org" . "https://orgmode.org/elpa/")
+                       ("melpa" . "https://melpa.org/packages/")
+                       ("gnu" . "https://elpa.gnu.org/packages/")))
+  (package-initialize)
+  (unless (package-installed-p 'leaf)
+    (package-refresh-contents)
+    (package-install 'leaf))
+
+  (leaf leaf-keywords
+    :ensure t
+    :init
+    ;; optional packages if you want to use :hydra, :el-get, :blackout,,,
+    (leaf hydra :ensure t)
+    (leaf el-get :ensure t)
+    (leaf blackout :ensure t)
+
+    :config
+    ;; initialize leaf-keywords.el
+    (leaf-keywords-init)))
+;; </leaf-install-code>
+
 ;;; global settings
 (setq make-backup-files nil)
 (setq auto-save-default nil)
@@ -41,16 +65,19 @@
 
 (setq text-mode-hook 'turn-off-auto-fill)
 
-;; package
-(require 'package)
-(setq package-archives
-      '(("melpa" . "https://melpa.org/packages/")
-        ("gnu" . "https://elpa.gnu.org/packages/")
-        ("org" . "https://orgmode.org/elpa/")))
-(package-initialize)
-(if package-archive-contents
-    (package-refresh-contents t)
-  (package-refresh-contents))
+(setq visible-bell 1)
+
+;; package config
+(leaf cus-edit
+  :doc "tools for customizing Emacs and Lisp packages"
+  :tag "builtin" "faces" "help"
+  :custom `((custom-file . ,(locate-user-emacs-file "custom.el"))))
+
+(leaf paren
+  :doc "highlight matching paren"
+  :tag "builtin"
+  :custom ((show-paren-delay . 0.1))
+  :global-minor-mode show-paren-mode)
 
 (setq my-favorite-packages
       '(
@@ -58,18 +85,13 @@
         ddskk
         magit
         markdown-mode
-        paredit
         slime
         smooth-scroll
-        undo-tree
-        xclip
-        color-theme-sanityinc-tomorrow
-        dracula-theme
         proof-general
         tuareg
         opam-switch-mode
-        solarized-theme
-        indent-guide))
+        multiple-cursors
+        leuven-theme))
 
 ;; possibly useful packages
 '(dtrt-indent
@@ -79,12 +101,31 @@
   (unless (package-installed-p package)
     (package-install package)))
 
-;;; indent-guide
-(indent-guide-global-mode)
+(leaf indent-guide
+  :doc "Show vertical lines to guide indentation"
+  :url "https://github.com/zk-phi/indent-guide"
+  :ensure t
+  :hook
+  (prog-mode-hook . indent-guide-mode))
 
-;;; xclip
-(unless window-system (xclip-mode 1))
-(when window-system (scroll-bar-mode -1))
+(leaf xclip
+  :unless (window-system)
+  :doc "Copy&paste GUI clipboard from text terminal"
+  :url "https://elpa.gnu.org/packages/xclip.html"
+  :ensure t
+  :global-minor-mode xclip-mode)
+
+(leaf undo-tree
+  :doc "Show undo histroy in tree shape"
+  :url "https://www.dr-qubit.org/undo-tree.html"
+  :ensure t
+  :global-minor-mode global-undo-tree-mode)
+
+(leaf paredit
+  :doc "Parenthetical editing in Emacs"
+  :url "https://paredit.org"
+  :ensure t
+  :hook emacs-lisp-mode lisp-mode lisp-interaction-ode scheme-mode)
 
 ;;; ddskk
 (global-set-key (kbd "C-x C-j") 'skk-mode)
@@ -92,19 +133,6 @@
 (add-hook 'isearch-mode-hook 'skk-isearch-mode-setup)
 (add-hook 'isearch-mode-end-hook 'skk-isearch-mode-cleanup)
 (setq skk-isearch-start-mode 'latin)
-
-;;; undo-tree
-(require 'undo-tree)
-(global-undo-tree-mode)
-
-;;; paredit
-(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t) 
-(add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
-(add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
-(add-hook 'ielm-mode-hook             #'enable-paredit-mode)
-(add-hook 'lisp-mode-hook             #'enable-paredit-mode)
-(add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
-(add-hook 'scheme-mode-hook           #'enable-paredit-mode)
 
 ;;; markdown-mode
 (autoload 'markdown-mode "markdown-mode"
@@ -148,6 +176,20 @@
 ;; Tuareg
 (setq tuareg-support-metaocaml t)
 
+;; Multiple-Cursors
+(require 'multiple-cursors)
+(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+(global-set-key (kbd "C->") 'mc/mark-next-like-this)
+(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+(define-key mc/keymap (kbd "<return>") nil)
+
+;; opam-switch-mode
+(use-package opam-switch-mode
+  :ensure t
+  :hook
+  ((coq-mode tuareg-mode) . opam-switch-mode))
+
 (when window-system
   (set-face-attribute 'default nil :family "Source Han Code JP" :height 120)
                                         ; 全角かな設定
@@ -164,18 +206,17 @@
                                         ; あいうえおあいうえおあいうえおあいうえお
   )
 
+(load-theme 'leuven t)
+
+(load-file (let ((coding-system-for-read 'utf-8))
+             (shell-command-to-string "agda-mode locate")))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-enabled-themes '(leuven))
- '(custom-safe-themes
-   '("efcecf09905ff85a7c80025551c657299a4d18c5fcfedd3b2f2b6287e4edd659" "524fa911b70d6b94d71585c9f0c5966fe85fb3a9ddd635362bfabd1a7981a307" "57a29645c35ae5ce1660d5987d3da5869b048477a7801ce7ab57bfb25ce12d3e" "4c56af497ddf0e30f65a7232a8ee21b3d62a8c332c6b268c81e9ea99b11da0d3" "3e200d49451ec4b8baa068c989e7fba2a97646091fd555eca0ee5a1386d56077" "285d1bf306091644fb49993341e0ad8bafe57130d9981b680c1dbd974475c5c7" "00445e6f15d31e9afaa23ed0d765850e9cd5e929be5e8e63b114a3346236c44c" default))
- '(highlight-indent-guides-method 'character)
  '(package-selected-packages
-   '(opam-switch-mode indent-guide highlight-indent-guides solarized-theme tuareg proof-general dracula-theme color-theme-sanityinc-tomorrow xclip undo-tree smooth-scroll slime paredit markdown-mode magit ddskk auctex))
- '(warning-suppress-types '(((unlock-file)) ((unlock-file)))))
+   '(leaf xclip undo-tree tuareg solarized-theme smooth-scroll slime proof-general paredit opam-switch-mode multiple-cursors markdown-mode magit leuven-theme indent-guide highlight-indent-guides dracula-theme ddskk color-theme-sanityinc-tomorrow auctex)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
