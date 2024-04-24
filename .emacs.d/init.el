@@ -122,8 +122,8 @@
          slime-repl-mode-hook))
 
 (leaf ddskk
-  :doc "hoge"
-  :url "url"
+  :doc "Daredevil SKK (Simple Kana to Kanji conversion program)"
+  :url "https://github.com/skk-dev/ddskk"
   :ensure t
   :custom ((skk-egg-like-newline . t)
            (skk-isearch-start-mode . 'latin))
