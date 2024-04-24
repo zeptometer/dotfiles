@@ -22,56 +22,55 @@
     (leaf-keywords-init)))
 ;; </leaf-install-code>
 
-;;; global settings
-(setq make-backup-files nil)
-(setq auto-save-default nil)
-;; keybind
-(global-set-key "\C-h" 'delete-backward-char)
-(global-set-key "\M-N" '(lambda () (interactive) (scroll-up 1)))
-(global-set-key "\M-P" '(lambda () (interactive) (scroll-down 1)))
+(leaf cus-start
+  :doc "define customization properties of builtins"
+  :bind (("\C-h" . 'delete-backward-char)
+         ("\M-N" . '(lambda () (interactive) (scroll-up 1)))
+         ("\M-P" . '(lambda () (interactive) (scroll-down 1))))
+  :custom ((inhibit-startup-message . t)
+           (initial-scratch-message . "")
+           (scroll-step . 1)
+           (visible-bell . 1)
+           (text-mode-hook . 'turn-off-auto-fill))
+  :init
+  (set-language-environment "Japanese")
+  (prefer-coding-system 'utf-8-unix)
+  (if window-system
+      (prog1 (tool-bar-mode 0) (scroll-bar-mode -1))
+    (prog1 (tool-bar-mode 1)
+      (menu-bar-mode -1)
+      (set-face-inverse-video 'vertical-border nil)
+      (set-face-background 'vertical-border (face-background 'default))
+      (set-display-table-slot standard-display-table
+                              'vertical-border
+                              (make-glyph-code ?|)))))
 
-;; coding
-(set-language-environment "Japanese")
-(prefer-coding-system 'utf-8-unix)
-
-;; scrolling
-(setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
-(setq mouse-wheel-progressive-speed t)
-(setq mouse-wheel-follow-mouse t)
-(setq scroll-step 1)
-(setq scroll-conservatively 10000)
-(setq scroll-margin 0)
-(setq scroll-preserve-screen-position t)
-
-;; view
-(show-paren-mode t)
-(column-number-mode t)
-(global-display-line-numbers-mode)
-(setq-default display-line-numbers-width 3)
-(tab-bar-mode 1)
-(if window-system
-    (tool-bar-mode 0)
-  (menu-bar-mode -1))
-
-(unless window-system
-  (set-face-inverse-video 'vertical-border nil)
-  (set-face-background 'vertical-border (face-background 'default))
-  (set-display-table-slot standard-display-table
-                          'vertical-border
-                          (make-glyph-code ?|)))
-
-(setq inhibit-startup-message t)
-(setq initial-scratch-message "")
-
-(setq text-mode-hook 'turn-off-auto-fill)
-
-(setq visible-bell 1)
-
-;; package config
 (leaf cus-edit
   :doc "tools for customizing Emacs and Lisp packages"
   :tag "builtin" "faces" "help"
   :custom `((custom-file . ,(locate-user-emacs-file "custom.el"))))
+
+(leaf files
+  :doc "file input and output commands for Emacs"
+  :tag "builtin"
+  :custom `((auto-save-timeout . 15)
+            (auto-save-interval . 60)
+            (auto-save-file-name-transforms . '((".*" ,(locate-user-emacs-file "backup/") t)))
+            (backup-directory-alist . '((".*" . ,(locate-user-emacs-file "backup"))
+                                        (,tramp-file-name-regexp . nil)))
+            (version-control . t)
+            (delete-old-versions . t)))
+
+(leaf pixel-scroll-precision
+  :when (window-system)
+  :global-minor-mode pixel-scroll-precision-mode
+  :custom ((pixel-scroll-precision-use-momentum . t)
+           (pixel-scroll-precision-momentum-seconds . 0.1)))
+
+(leaf display-line-numbers-mode
+  :doc "show line numbers"
+  :global-minor-mode global-display-line-numbers-mode
+  :custom ((display-line-numbers-width . 3)))
 
 (leaf paren
   :doc "highlight matching paren"
@@ -79,27 +78,22 @@
   :custom ((show-paren-delay . 0.1))
   :global-minor-mode show-paren-mode)
 
+(leaf macrostep
+  :ensure t
+  :bind (("C-c e" . macrostep-expand)))
+
+(leaf smooth-scroll
+  :doc "Minor mode for smooth scrolling and in-place scrolling."
+  :url "https://www.emacswiki.org/emacs/smooth-scroll.el"
+  :ensure t
+  :global-minor-mode smooth-scroll-mode)
+
 (setq my-favorite-packages
       '(
         auctex
         ddskk
-        magit
         markdown-mode
-        slime
-        smooth-scroll
-        proof-general
-        tuareg
-        opam-switch-mode
-        multiple-cursors
-        leuven-theme))
-
-;; possibly useful packages
-'(dtrt-indent
-  flycheck)
-
-(dolist (package my-favorite-packages)
-  (unless (package-installed-p package)
-    (package-install package)))
+        slime))
 
 (leaf indent-guide
   :doc "Show vertical lines to guide indentation"
@@ -125,23 +119,26 @@
   :doc "Parenthetical editing in Emacs"
   :url "https://paredit.org"
   :ensure t
-  :hook emacs-lisp-mode lisp-mode lisp-interaction-ode scheme-mode)
+  :hook (emacs-lisp-mode-hook
+         lisp-mode-hook
+         lisp-interaction-mode-hook
+         scheme-mode-hook))
 
 ;;; ddskk
-(global-set-key (kbd "C-x C-j") 'skk-mode)
-(setq skk-egg-like-newline t)
-(add-hook 'isearch-mode-hook 'skk-isearch-mode-setup)
-(add-hook 'isearch-mode-end-hook 'skk-isearch-mode-cleanup)
-(setq skk-isearch-start-mode 'latin)
+(leaf ddskk
+  :doc "hoge"
+  :url "url"
+  :ensure t
+  :custom ((skk-egg-like-newline . t)
+           (skk-isearch-start-mode . 'latin))
+  :bind (("C-x C-j" . skk-mode))
+  :hook ((isearch-mode-hook . skk-isearch-mode-setup)
+         (isearch-mode-end-hook . skk-isearch-mode-cleanup)))
 
 ;;; markdown-mode
 (autoload 'markdown-mode "markdown-mode"
   "Major mode for editing Markdown files" t)
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
-
-;;; smooth-scrolling
-(require 'smooth-scroll)
-(smooth-scroll-mode t)
 
 ;;; eshell
 (setq eshell-command-aliases-list
@@ -173,22 +170,42 @@
 ;; (add-to-list 'load-path "~/Dropbox/Codes/Beluga/tools/")
 ;; (load "beluga-mode.el")
 
-;; Tuareg
-(setq tuareg-support-metaocaml t)
-
-;; Multiple-Cursors
-(require 'multiple-cursors)
-(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
-(global-set-key (kbd "C->") 'mc/mark-next-like-this)
-(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-(define-key mc/keymap (kbd "<return>") nil)
-
-;; opam-switch-mode
-(use-package opam-switch-mode
+(leaf multiple-cursors
+  :doc "Multiple cursors for Emacs."
+  :url "https://github.com/magnars/multiple-cursors.el"
   :ensure t
-  :hook
-  ((coq-mode tuareg-mode) . opam-switch-mode))
+  :bind (("C-S-c C-S-c" . 'mc/edit-lines) 
+         ("C->" . 'mc/mark-next-like-this)
+         ("C-<" . 'mc/mark-previous-like-this)
+         ("C-c C-<" . 'mc/mark-all-like-this)
+         (mc/keymap ("<return>" . nil))))
+
+(leaf magit
+  :doc "A Git Porcelain inside Emacs"
+  :url "https://magit.vc"
+  :ensure t)
+
+(leaf tuareg
+  :doc "OCaml mode for Emacs"
+  :url "https://github.com/ocaml/tuareg"
+  :custom ((tuareg-support-metaocaml . t)))
+
+(leaf proof-general
+  :doc "Organize your proofs!"
+  :url "https://proofgeneral.github.io"
+  :ensure t)
+
+(leaf opam-switch-mode
+  :doc "Run opam switch from Emacs"
+  :url "https://github.com/ProofGeneral/opam-switch-mode"
+  :ensure t
+  :hook ((coq-mode tuareg-mode) . opam-switch-mode))
+
+(leaf leuven-theme
+  :doc "This Emacs theme reduces eye strain with a light, high-contrast color scheme, syntax highlighting, and support for multiple modes."
+  :url "https://github.com/fniessen/emacs-leuven-theme"
+  :ensure t
+  :config (load-theme 'leuven t))
 
 (when window-system
   (set-face-attribute 'default nil :family "Source Han Code JP" :height 120)
@@ -206,7 +223,6 @@
                                         ; あいうえおあいうえおあいうえおあいうえお
   )
 
-(load-theme 'leuven t)
 
 (load-file (let ((coding-system-for-read 'utf-8))
              (shell-command-to-string "agda-mode locate")))
