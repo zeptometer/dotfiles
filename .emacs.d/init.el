@@ -24,14 +24,16 @@
 
 (leaf cus-start
   :doc "define customization properties of builtins"
-  :bind (("\C-h" . 'delete-backward-char)
-         ("\M-N" . '(lambda () (interactive) (scroll-up 1)))
-         ("\M-P" . '(lambda () (interactive) (scroll-down 1))))
+  :bind (("C-h" . 'delete-backward-char)
+         ("M-N" . '(lambda () (interactive) (scroll-up 1)))
+         ("M-P" . '(lambda () (interactive) (scroll-down 1))))
   :custom ((inhibit-startup-message . t)
            (initial-scratch-message . "")
            (scroll-step . 1)
            (visible-bell . 1)
-           (text-mode-hook . 'turn-off-auto-fill))
+           (text-mode-hook . 'turn-off-auto-fill)
+           (tab-width . 2)
+           (indent-tabs-mode . nil))
   :init
   (set-language-environment "Japanese")
   (prefer-coding-system 'utf-8-unix)
@@ -79,6 +81,8 @@
   :global-minor-mode show-paren-mode)
 
 (leaf macrostep
+  :doc "interactive macro expander"
+  :url "https://github.com/emacsorphanage/macrostep"
   :ensure t
   :bind (("C-c e" . macrostep-expand)))
 
@@ -88,19 +92,11 @@
   :ensure t
   :global-minor-mode smooth-scroll-mode)
 
-(setq my-favorite-packages
-      '(
-        auctex
-        ddskk
-        markdown-mode
-        slime))
-
 (leaf indent-guide
   :doc "Show vertical lines to guide indentation"
   :url "https://github.com/zk-phi/indent-guide"
   :ensure t
-  :hook
-  (prog-mode-hook . indent-guide-mode))
+  :hook (prog-mode-hook . indent-guide-mode))
 
 (leaf xclip
   :unless (window-system)
@@ -122,9 +118,9 @@
   :hook (emacs-lisp-mode-hook
          lisp-mode-hook
          lisp-interaction-mode-hook
-         scheme-mode-hook))
+         scheme-mode-hook
+         slime-repl-mode-hook))
 
-;;; ddskk
 (leaf ddskk
   :doc "hoge"
   :url "url"
@@ -135,40 +131,23 @@
   :hook ((isearch-mode-hook . skk-isearch-mode-setup)
          (isearch-mode-end-hook . skk-isearch-mode-cleanup)))
 
-;;; markdown-mode
-(autoload 'markdown-mode "markdown-mode"
-  "Major mode for editing Markdown files" t)
-(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+(leaf eshell
+  :doc "Emacs Shell"
+  :custom (eshell-command-aliases-list . '(("ff" "find-file $1")
+                                           ("d" "dired $1")))
+  :config (eshell) ; start eshell on initialization
+  )
 
-;;; eshell
-(setq eshell-command-aliases-list
-      '(("ff" "find-file $1")
-        ("d" "dired $1")))
-(eshell) ; start eshell on initialization
-
-;;; AUC Tex
-(setq TeX-electric-math (cons "$" "$"))
-(setq LaTeX-electric-left-right-brace t)
-
-;;; tab
-(setq-default tab-width 2 indent-tabs-mode nil)
-
-;;; slime
-(require 'slime)
-(setq inferior-lisp-program "sbcl")
-(add-hook 'slime-repl-mode-hook (lambda () (paredit-mode +1)))
-(slime-setup '(slime-repl slime-fancy slime-banner))
-
-;; Stop SLIME's REPL from grabbing DEL,
-;; which is annoying when backspacing over a '('
-(defun override-slime-repl-bindings-with-paredit ()
-  (define-key slime-repl-mode-map
-              (read-kbd-macro paredit-backward-delete-key) nil))
-(add-hook 'slime-repl-mode-hook 'override-slime-repl-bindings-with-paredit)
-
-;; Beluga mode
-;; (add-to-list 'load-path "~/Dropbox/Codes/Beluga/tools/")
-;; (load "beluga-mode.el")
+(leaf slime
+  :doc "SLIME is the Superior Lisp Interaction Mode for Emacs."
+  :url "https://github.com/slime/slime"
+  :ensure t
+  :custom ((inferior-lisp-program . "sbcl"))
+  ;; Stop SLIME's REPL from grabbing DEL,
+  ;; which is annoying when backspacing over a '('
+  :hook (slime-repl-mode-hook . #'(lambda () (define-key slime-repl-mode-map
+                                                         (read-kbd-macro paredit-backward-delete-key) nil)))
+  :config (slime-setup '(slime-repl slime-fancy slime-banner)))
 
 (leaf multiple-cursors
   :doc "Multiple cursors for Emacs."
@@ -226,16 +205,4 @@
 
 (load-file (let ((coding-system-for-read 'utf-8))
              (shell-command-to-string "agda-mode locate")))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(leaf xclip undo-tree tuareg solarized-theme smooth-scroll slime proof-general paredit opam-switch-mode multiple-cursors markdown-mode magit leuven-theme indent-guide highlight-indent-guides dracula-theme ddskk color-theme-sanityinc-tomorrow auctex)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+
