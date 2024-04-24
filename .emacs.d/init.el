@@ -40,12 +40,7 @@
   (if window-system
       (prog1 (tool-bar-mode 0) (scroll-bar-mode -1))
     (prog1 (tool-bar-mode 1)
-      (menu-bar-mode -1)
-      (set-face-inverse-video 'vertical-border nil)
-      (set-face-background 'vertical-border (face-background 'default))
-      (set-display-table-slot standard-display-table
-                              'vertical-border
-                              (make-glyph-code ?|)))))
+      (menu-bar-mode -1))))
 
 (leaf cus-edit
   :doc "tools for customizing Emacs and Lisp packages"
@@ -183,6 +178,7 @@
 (leaf leuven-theme
   :doc "This Emacs theme reduces eye strain with a light, high-contrast color scheme, syntax highlighting, and support for multiple modes."
   :url "https://github.com/fniessen/emacs-leuven-theme"
+  :when (window-system)
   :ensure t
   :config (load-theme 'leuven t))
 
