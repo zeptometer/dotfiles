@@ -12,13 +12,14 @@ link_dotfiles() {
     fi
     ln -sf -t ~/ ${DIR}/.emacs.d/
     ln -sf -t ~/ ${DIR}/.agda
+    ln -sf -t ~/ ${DIR}/.gitignore_global
 
     cp ${DIR}/.config/autostart/* ~/.config/autostart/
 }
 
 install_dependencies() {
 	sudo pacman -Sy
-    sudo pacman -S --noconfirm --needed base-devel yay manjaro-asian-input-support-ibus ibus-skk skk-jisyo vivaldi discord bitwarden steam code emacs tmux awesome-terminal-fonts opam the_silver_searcher xclip tailscale ledger-live-bin guake manjaro-printer avahi obsidian gimp inkscape agda agda-stdlib gtksourceview3
+    sudo pacman -S --noconfirm --needed base-devel yay manjaro-asian-input-support-ibus ibus-skk skk-jisyo vivaldi discord bitwarden steam code emacs tmux awesome-terminal-fonts opam the_silver_searcher xclip tailscale ledger-live-bin guake manjaro-printer avahi obsidian gimp inkscape agda agda-stdlib gtksourceview3 libreoffice-still libreoffice-still-ja lftp
     sudo pacman -S --noconfirm --needed texlive-latex texlive-latexrecommended texlive-latexextra texlive-fontsrecommended texlive-fontsextra texlive-mathscience texlive-langcjk texlive-luatex texlive-binextra
 
     yes | LANG=C yay --answerdiff None --answerclean None --mflags "--noconfirm" -S --needed slack-electron zoom dropbox zotero otf-source-han-code-jp
@@ -35,6 +36,7 @@ setup_agda() {
 setup_git() {
     git config --global user.name "Yuito Murase"
     git config --global user.email yuito@acupof.coffee
+    git config --global core.excludesfile ~/.gitignore_global
 
     if [ ! -f ~/.ssh/id_ed25519 ]; then
         ssh-keygen -t ed25519 -C ${HOST} -f ~/.ssh/id_ed25519 -P $SSHPASS
