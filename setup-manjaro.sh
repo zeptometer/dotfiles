@@ -19,10 +19,10 @@ link_dotfiles() {
 
 install_dependencies() {
 	sudo pacman -Sy
-    sudo pacman -S --noconfirm --needed base-devel yay manjaro-asian-input-support-ibus ibus-skk skk-jisyo vivaldi discord bitwarden steam code emacs tmux awesome-terminal-fonts opam the_silver_searcher xclip tailscale ledger-live-bin guake manjaro-printer avahi obsidian gimp inkscape agda agda-stdlib gtksourceview3 libreoffice-still libreoffice-still-ja lftp
+    sudo pacman -S --noconfirm --needed base-devel yay manjaro-asian-input-support-ibus ibus-skk skk-jisyo vivaldi discord bitwarden steam code emacs tmux awesome-terminal-fonts opam the_silver_searcher xclip tailscale ledger-live-bin guake manjaro-printer avahi obsidian gimp inkscape agda agda-stdlib gtksourceview3 libreoffice-still libreoffice-still-ja lftp snapd
     sudo pacman -S --noconfirm --needed texlive-latex texlive-latexrecommended texlive-latexextra texlive-fontsrecommended texlive-fontsextra texlive-mathscience texlive-langcjk texlive-luatex texlive-binextra
 
-    yes | LANG=C yay --answerdiff None --answerclean None --mflags "--noconfirm" -S --needed slack-electron zoom dropbox zotero otf-source-han-code-jp
+    yes | LANG=C yay --answerdiff None --answerclean None --mflags "--noconfirm" -S --needed slack-electron zoom dropbox nautilus-dropbox zotero otf-source-han-code-jp
 
     # might not be working
     # xdg-settings set default-web-browser vivaldi.desktop
@@ -46,7 +46,7 @@ setup_git() {
 setup_opam() {
     opam init -a
     eval $(opam env --switch=default)
-    opam install -y ocaml-lsp-server odoc ocamlformat utop ott
+    opam install -y ocaml-lsp-server merlin odoc ocamlformat utop ott
 
     # Coq
     opam install -y coq coqide
@@ -54,6 +54,7 @@ setup_opam() {
     # BER MetaOCaml
     if ! opam switch list | grep -q 4.14.1+BER; then
         opam switch create 4.14.1+BER -y
+        opam install -y merlin utop
     fi
 
     # Use default switch
