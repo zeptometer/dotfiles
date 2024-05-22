@@ -5,6 +5,10 @@ set -eux
 DIR=$(pwd)
 SSHPASS=FILLMEIN
 
+initialize() {
+    mkdir -p ${DIR}/tmp
+}
+
 link_dotfiles() {
     ln -sf -t ~/ ${DIR}/.tmux.conf
     if [ -e ~/.emacs.d ] ; then
@@ -19,8 +23,8 @@ link_dotfiles() {
 
 install_dependencies() {
 	sudo pacman -Sy
-    sudo pacman -S --noconfirm --needed base-devel yay manjaro-asian-input-support-ibus ibus-skk skk-jisyo vivaldi discord bitwarden steam code emacs tmux awesome-terminal-fonts opam the_silver_searcher xclip tailscale ledger-live-bin guake manjaro-printer avahi obsidian gimp inkscape agda agda-stdlib gtksourceview3 libreoffice-still libreoffice-still-ja lftp snapd
-    sudo pacman -S --noconfirm --needed texlive-latex texlive-latexrecommended texlive-latexextra texlive-fontsrecommended texlive-fontsextra texlive-mathscience texlive-langcjk texlive-luatex texlive-binextra
+  sudo pacman -S --noconfirm --needed base-devel yay manjaro-asian-input-support-ibus ibus-skk skk-jisyo vivaldi discord bitwarden steam code emacs tmux awesome-terminal-fonts opam the_silver_searcher xclip tailscale ledger-live-bin guake manjaro-printer avahi obsidian gimp inkscape agda agda-stdlib gtksourceview3 libreoffice-still libreoffice-still-ja lftp snapd jdk-openjdk openjdk-src nvm
+  sudo pacman -S --noconfirm --needed texlive-latex texlive-latexrecommended texlive-latexextra texlive-fontsrecommended texlive-fontsextra texlive-mathscience texlive-langcjk texlive-luatex texlive-binextra
 
     yes | LANG=C yay --answerdiff None --answerclean None --mflags "--noconfirm" -S --needed slack-electron zoom dropbox nautilus-dropbox zotero otf-source-han-code-jp
 
@@ -36,6 +40,7 @@ setup_agda() {
 setup_git() {
     git config --global user.name "Yuito Murase"
     git config --global user.email yuito@acupof.coffee
+    git config --global core.editor "emacsclient -nw -a ''"
     git config --global core.excludesfile ~/.gitignore_global
 
     if [ ! -f ~/.ssh/id_ed25519 ]; then
@@ -62,6 +67,22 @@ setup_opam() {
     eval $(opam env --switch=default)
 }
 
+setup_scala() {
+    if [ ! -f ${DIR}/tmp/cs ]; then
+        # Copied from https://scala-lang.org/download/
+        curl -fL https://github.com/coursier/coursier/releases/latest/download/cs-x86_64-pc-linux.gz | gzip -d > tmp/cs
+        chmod +x tmp/cs
+    else
+        echo "Skipping: Scala setup script is already downloaded"
+    fi
+
+    if which scalac; then
+        echo "Skipping: Scala is already installed"
+    else
+        tmp/cs setup -y
+    fi
+}
+
 setup_printer() {
     sudo systemctl enable --now cups.service
     sudo systemctl enable --now cups.socket
@@ -85,9 +106,11 @@ blocking_setup_tailscale() {
     sudo tailscale up
 }
 
+initialize
 install_dependencies
 setup_git
 setup_opam
+setup_scala
 setup_printer
 setup_tmux
 link_dotfiles
