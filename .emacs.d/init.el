@@ -22,6 +22,32 @@
     (leaf-keywords-init)))
 ;; </leaf-install-code>
 
+(defun my-frame-tweaks (&optional frame)
+  (tool-bar-mode 1)
+  (menu-bar-mode -1)
+  (unless frame
+    (setq frame (selected-frame)))
+  (when frame
+    (with-selected-frame frame
+      (when (display-graphic-p)
+        (tool-bar-mode 0)
+        (scroll-bar-mode -1)
+        (set-face-attribute 'default nil :family "Source Han Code JP" :height 120)
+                                        ; 全角かな設定
+        (set-fontset-font (frame-parameter nil 'font)
+                          'japanese-jisx0208
+                          (font-spec :family "Source Han Code JP" :size 14))
+                                        ; 半角ｶﾅ設定
+        (set-fontset-font (frame-parameter nil 'font)
+                          'katakana-jisx0201
+                          (font-spec :family "Source Han Code JP" :size 14))
+                                        ; ずれ確認用
+                                        ; 0123456789012345678901234567890123456789
+                                        ; ｱｲｳｴｵｱｲｳｴｵｱｲｳｴｵｱｲｳｴｵｱｲｳｴｵｱｲｳｴｵｱｲｳｴｵｱｲｳｴｵ
+                                        ; あいうえおあいうえおあいうえおあいうえお
+        ;; (load-theme 'leuven t)
+        ))))
+
 (leaf cus-start
   :doc "define customization properties of builtins"
   :bind (("C-h" . 'delete-backward-char)
@@ -34,17 +60,15 @@
            (text-mode-hook . 'turn-off-auto-fill)
            (tab-width . 2)
            (indent-tabs-mode . nil)
-           (cursor-type . 'bar))
+           (cursor-type . 'bar)
+           (show-trailing-whitespace . t))
+  :hook (after-make-frame-functions . my-frame-tweaks)
   :init
   (set-language-environment "Japanese")
   (prefer-coding-system 'utf-8-unix)
-  (if window-system
-      (prog1 (tool-bar-mode 0) (scroll-bar-mode -1))
-    (prog1 (tool-bar-mode 1)
-      (menu-bar-mode -1))))
+  (my-frame-tweaks))
 
-(leaf cus-edit
-  :doc "tools for customizing Emacs and Lisp packages"
+(leaf cus-edit  :doc "tools for customizing Emacs and Lisp packages"
   :tag "builtin" "faces" "help"
   :custom `((custom-file . ,(locate-user-emacs-file "custom.el"))))
 
@@ -109,7 +133,8 @@
   :doc "Show undo histroy in tree shape"
   :url "https://www.dr-qubit.org/undo-tree.html"
   :ensure t
-  :global-minor-mode global-undo-tree-mode)
+  :global-minor-mode global-undo-tree-mode
+  :custom ((undo-tree-history-directory-alist . '(("." . "~/.emacs.d./.cache")))))
 
 (leaf paredit
   :doc "Parenthetical editing in Emacs"
@@ -135,7 +160,7 @@
   :doc "Emacs Shell"
   :custom (eshell-command-aliases-list . '(("ff" "find-file $1")
                                            ("d" "dired $1")))
-  :config (eshell) ; start eshell on initialization
+  ;; :config (eshell) ; start eshell on initialization
   )
 
 (leaf slime
@@ -149,15 +174,30 @@
                                                          (read-kbd-macro paredit-backward-delete-key) nil)))
   :config (slime-setup '(slime-repl slime-fancy slime-banner)))
 
-(leaf latex-mode
-  :doc "Emacs mode for Latex"
-  :push ((auto-mode-alist . '("\\.otex\\'" . latex-mode))))
+(leaf yatex
+  :ensure t
+  ;; :commands autoload するコマンドを指定
+  :commands (yatex-mode)
+  ;; :mode auto-mode-alist の設定
+  :mode ("\\.tex\\'" "\\.ltx\\'" "\\.cls\\'" "\\.sty\\'" "\\.clo\\'" "\\.bbl\\'" "\\.otex\\'")
+  :custom
+  ((YaTeX-inhibit-prefix-letter . t)
+   (YaTeX-kanji-code . nil)
+   (YaTeX-latex-message-code . 'utf-8)
+   (YaTeX-use-LaTeX2e . t)
+   (YaTeX-use-AMS-LaTeX . t)
+   (tex-command . "latexmk")
+   (tex-pdfview-command . "xdg-open"))
+  :config
+  (auto-fill-mode 0)
+  ;; company-tabnineによる補完。companyについては後述
+  (set (make-local-variable 'company-backends) '(company-tabnine)))
 
 (leaf multiple-cursors
   :doc "Multiple cursors for Emacs."
   :url "https://github.com/magnars/multiple-cursors.el"
   :ensure t
-  :bind (("C-S-c C-S-c" . 'mc/edit-lines) 
+  :bind (("C-S-c C-S-c" . 'mc/edit-lines)
          ("C->" . 'mc/mark-next-like-this)
          ("C-<" . 'mc/mark-previous-like-this)
          ("C-c C-<" . 'mc/mark-all-like-this)
@@ -222,8 +262,7 @@
   :doc "This Emacs theme reduces eye strain with a light, high-contrast color scheme, syntax highlighting, and support for multiple modes."
   :url "https://github.com/fniessen/emacs-leuven-theme"
   :when (window-system)
-  :ensure t
-  :config (load-theme 'leuven t))
+  :ensure t)
 
 (leaf ott-mode
   :doc "Emacs mode for Ott"
@@ -238,21 +277,26 @@
   :ensure t
   :global-minor-mode (global-diff-hl-mode global-diff-hl-show-hunk-mouse-mode))
 
-(when window-system
-  (set-face-attribute 'default nil :family "Source Han Code JP" :height 120)
-                                        ; 全角かな設定
-  (set-fontset-font (frame-parameter nil 'font)
-                    'japanese-jisx0208
-                    (font-spec :family "Source Han Code JP" :size 14))
-                                        ; 半角ｶﾅ設定
-  (set-fontset-font (frame-parameter nil 'font)
-                    'katakana-jisx0201
-                    (font-spec :family "Source Han Code JP" :size 14))
-                                        ; ずれ確認用
-                                        ; 0123456789012345678901234567890123456789
-                                        ; ｱｲｳｴｵｱｲｳｴｵｱｲｳｴｵｱｲｳｴｵｱｲｳｴｵｱｲｳｴｵｱｲｳｴｵｱｲｳｴｵ
-                                        ; あいうえおあいうえおあいうえおあいうえお
+;; Enable vertico
+(leaf vertico
+  :doc "VERTical Interactive COmpletion"
+  :url "https://github.com/minad/vertico"
+  :ensure t
+  :global-minor-mode vertico-mode
+
+  ;; Different scroll margin
+  ;; (setq vertico-scroll-margin 0)
+
+  ;; Show more candidates
+  ;; (setq vertico-count 20)
+
+  ;; Grow and shrink the Vertico minibuffer
+  ;; (setq vertico-resize t)
+
+  ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
+  ;; (setq vertico-cycle t)
   )
+
 
 
 (load-file (let ((coding-system-for-read 'utf-8))
@@ -261,3 +305,4 @@
 ;; ## added by OPAM user-setup for emacs / base ## 56ab50dc8996d2bb95e7856a6eddb17b ## you can edit, but keep this line
 (require 'opam-user-setup "~/.emacs.d/opam-user-setup.el")
 ;; ## end of OPAM user-setup addition for emacs / base ## keep this line
+
