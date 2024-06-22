@@ -120,7 +120,9 @@
   :doc "Show vertical lines to guide indentation"
   :url "https://github.com/zk-phi/indent-guide"
   :ensure t
-  :hook (prog-mode-hook . indent-guide-mode))
+  :hook (prog-mode-hook . indent-guide-mode)
+  :config
+  (set-face-foreground 'indent-guide-face "darkcyan"))
 
 (leaf xclip
   :unless (window-system)
@@ -210,10 +212,22 @@
   :hook ((magit-pre-refresh-hook . diff-hl-magit-pre-refresh)
          (magit-post-refresh-hook . diff-hl-magit-post-refresh)))
 
+(defun my-tuareg-mode-hook ()
+  "hoge"
+  (define-key tuareg-mode-map (kbd "C-h") 'delete-backward-char))
+
 (leaf tuareg
   :doc "OCaml mode for Emacs"
   :url "https://github.com/ocaml/tuareg"
-  :custom ((tuareg-support-metaocaml . t)))
+  :ensure t
+  :custom ((tuareg-support-metaocaml . t))
+  :hook ((tuareg-mode-hook . my-tuareg-mode-hook)))
+
+(leaf dune
+  :doc "Integration with the dune build system"
+  :url "https://github.com/ocaml/dune"
+  :added "2023-05-14"
+  :ensure t)
 
 (leaf proof-general
   :doc "Organize your proofs!"
@@ -251,7 +265,7 @@
   :ensure t
   :custom ((lsp-keymap-prefix . "C-c C-l"))
   :bind ("C-c h" . lsp-describe-thing-at-point)
-  :hook (rust-mode-hook))
+  :hook (rust-mode-hook tuareg-mode-hook))
 
 (leaf lsp-ui
   :doc "UI integrations for lsp-mode"
@@ -297,7 +311,29 @@
   ;; (setq vertico-cycle t)
   )
 
+(leaf orderless
+  :doc "Emacs completion style that matches multiple regexps in any order"
+  :url "https://github.com/oantolin/orderless"
+  :ensure t
+  :custom ((completion-styles . '(orderless basic))
+           (completion-category-overrides . '((file (styles basic partial-completion))))))
 
+(leaf marginalia
+  :doc "Marginalia in the minibuffer"
+  :url "https://github.com/minad/marginalia"
+  :ensure t
+  ;; Bind `marginalia-cycle' locally in the minibuffer.  To make the binding
+  ;; available in the *Completions* buffer, add it to the
+  ;; `completion-list-mode-map'.
+  :bind ((minibuffer-local-map ("M-A" . marginalia-cycle)))
+
+  ;; The :init section is always executed.
+  :init
+
+  ;; Marginalia must be activated in the :init section of use-package such that
+  ;; the mode gets enabled right away. Note that this forces loading the
+  ;; package.
+  (marginalia-mode))
 
 (load-file (let ((coding-system-for-read 'utf-8))
              (shell-command-to-string "agda-mode locate")))
